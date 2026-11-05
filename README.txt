@@ -1,4 +1,4 @@
-Hisab Book (হিসাব বুক) — টাকার লেনদেন হিসাব ওয়েব অ্যাপ্লিকেশন — ভার্সন ১.০
+Hisab Book (হিসাব বুক) — টাকার লেনদেন হিসাব ওয়েব অ্যাপ্লিকেশন — ভার্সন ১.১
 
 ফাইল: index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png
 
@@ -8,6 +8,6 @@ GitHub Pages-এ প্রকাশ (repository নাম: hisab-book):
 3. Settings → Pages → Branch: main, Folder: /(root) → Save।
 4. কিছুক্ষণ পর https://আপনার-ইউজারনেম.github.io/hisab-book/ লিংকে অ্যাপ চালু হবে।
 
-আপডেট দিলে: নতুন ফাইল আপলোড করুন; sw.js-এর প্রথম লাইনে 'hisab-book-v1' বদলে 'hisab-book-v2' করুন।
+আপডেট দিলে: নতুন ফাইল আপলোড করুন; sw.js-এর প্রথম লাইনে 'hisab-book-v2' বদলে 'hisab-book-v3' করুন।
 
 ব্যাকআপ: তথ্য ব্রাউজারের localStorage-এ থাকে। নিয়মিত "CSV ব্যাকআপ" নিন, রিস্টোরে "CSV ফাইল বেছে রিস্টোর" ব্যবহার করুন।
