@@ -297,8 +297,8 @@ const r2=x=>Math.round(x*100)/100;
 const did=id=>String(id).replace(/^([A-Za-z]+)-0*(\d+)$/,(m,p,n)=>p+'-'+n.padStart(3,'0'));
 const nid=k=>T[k].p+'-'+String(Math.max(0,...S.acc.filter(a=>a.k==k).map(a=>parseInt(String(a.id).split('-')[1],10)||0))+1).padStart(3,'0');
 const dot=c=>`<i class="dot ${c.pend>0?'r':'g'}"></i>`;
-function calc(a){const ts=txs(a);let given=a.p,ret=0,pi=0,wv=0,lp=0,da=0;
-ts.forEach(t=>{const k=t.t;if(k=='add')given+=t.a;if(k=='ret')ret+=t.a;if(k=='int')pi+=t.a;if(k=='wv')wv+=t.a;if(k=='lp'){pi+=t.a;lp+=t.a}if(k=='pa')pi+=t.a;if(k=='pb')da+=t.a});
+function calc(a){const ts=txs(a),acr=[];let given=a.p,ret=0,pi=0,wv=0,lp=0,da=0;
+ts.forEach(t=>{const k=t.t;if(k=='add')given+=t.a;if(k=='ret')ret+=t.a;if(k=='int')pi+=t.a;if(k=='wv')wv+=t.a;if(k=='lp'){pi+=t.a;lp+=t.a}if(k=='pa')pi+=t.a;if(k=='pb'){da+=t.a;acr.push({d:t.d,v:t.a})}});
 const t0=today();let end=a.done&&a.end?a.end:t0,lim=a.done&&a.end?a.end:am(t0,1),stp=null,auto=false;{const mx=ts.filter(t=>t.t=='me').map(t=>t.d).sort().pop();if(!(a.done&&a.end)&&mx&&mx>lim)lim=mx}let due=0,run=0,s=a.d,el=0,n=0,last=null,pk=null,gs=[],chs=[];
 if(a.k!='l'){
 const ch=[{k:'P',d:a.d,amt:a.p,r:a.r,fx:a.fx}],ccs={};ts.filter(t=>t.t=='cc').forEach(t=>{ccs[t.ct]=t.d});
@@ -318,8 +318,8 @@ Object.values(G).forEach(g=>{let s=ch[g.ix[0]].d,mi=0,gd=0,mm=0;const cc0=ccs[ch
 dy=d=>{if(gp.some(q=>d>=q[0]&&d<q[1]))return 0;const r=at(d);let x=0;g.ix.forEach(i=>{const c=ch[i];x+=c.fx?(r[i]>0?c.fx:0):r[i]*c.r/100});return x};
 for(;;){let mc=ms[mi];while(mc!==undefined&&mc<=s){mi++;mc=ms[mi]}if(mc!==undefined&&mc>gL)mc=undefined;const nat=am(s,1);
 if(mc!==undefined&&mc<=nat){cl.push([s,mc]);s=mc;mi++;continue}if(nat<=gE){cl.push([s,nat]);s=nat;continue}if(mc!==undefined){cl.push([s,mc]);s=mc;mi++;continue}break}
-cl.forEach(([x,y])=>{const L=dd(x,am(x,1)),D=dd(x,y);let pm=0;if(gp.some(q=>q[0]<y&&q[1]>x)){for(let i=0;i<D;i++)pm+=dy(ad(x,i))/L}else pm=dy(x);{const v=Math.floor(pm+1e-6);due+=v;gd+=v}});
-(g.ad||[]).forEach(q=>{const v=Math.round(q.mn*dy(q.d));due+=v;gd+=v;mm+=q.mn});
+cl.forEach(([x,y])=>{const L=dd(x,am(x,1)),D=dd(x,y);let pm=0;if(gp.some(q=>q[0]<y&&q[1]>x)){for(let i=0;i<D;i++)pm+=dy(ad(x,i))/L}else pm=dy(x);{const v=Math.floor(pm+1e-6);due+=v;gd+=v;acr.push({d:y,v})}});
+(g.ad||[]).forEach(q=>{const v=Math.round(q.mn*dy(q.d));due+=v;gd+=v;mm+=q.mn;acr.push({d:q.d,v})});
 let e=0,rn=0;if(!a.done&&!cc0){const L=dd(s,am(s,1));e=Math.max(0,dd(s,stp&&stp<t0?stp:t0));let pm=0;for(let i=0;i<e;i++)pm+=dy(ad(s,i))/L;rn=Math.floor(pm+1e-6)}
 const nx=am(s,1);run+=rn;n+=cl.length;
 gs.push({s,nx,el:e,run:rn,due:gd,mm,ix:g.ix,keys:g.ix.map(i=>ch[i].k),n:cl.length,act:!cc0&&g.ix.some(i=>fin[i]>0),cl:cc0||null,days:Math.ceil((new Date(nx)-new Date(t0))/864e5)})});
@@ -329,7 +329,7 @@ const nl=gs.filter(g=>g.n>0).map(g=>g.s).sort();last=nl.length?nl[nl.length-1]:n
 const ord=[ch[0]].concat(ch.slice(1).sort((x,y)=>x.d<y.d?-1:x.d>y.d?1:0));
 chs=ord.map((h,k)=>{const i=ch.indexOf(h),g=gs.find(q=>q.ix.includes(i));return{k:h.k,n:k+1,d:h.d,amt:h.amt,rem:fin[i]||0,cs:g.s,nx:g.nx,due:g.due,run:g.run,el:g.el,cn:g.n+(g.mm||0),days:g.days,cl:g.cl,act:g.act,rt:h.fx?bn(h.fx)+' / মাস':nb(h.r)+'%'}});{const ex={};chs.forEach(h=>ex[h.k]=0);let xp=0;ts.forEach(t=>{if((t.t=='int'||t.t=='wv')&&t.ct&&ex[t.ct]!==undefined){ex[t.ct]+=t.a;xp+=t.a}});let U=pi+wv-xp;chs.forEach(h=>{let u;if(U>=0)u=Math.min(Math.max(0,h.due-ex[h.k]),U);else u=Math.max(U,-ex[h.k]);U-=u;h.coll=r2(ex[h.k]+u);h.pend=r2(h.due-h.coll)})}}
 due=r2(due+da);run=r2(run);const o=r2(due-pi-wv),nx=am(s,1);
-return{given,ret,rem:given-ret,due,pi,wv,lp,pend:Math.max(0,o),ob:o,runG:run,run:Math.max(0,r2(run+Math.min(0,o))),el,owe:Math.max(0,r2(due+run-pi-wv)),nx,days:Math.ceil((new Date(nx)-new Date(t0))/864e5),n,last,cs:s,gs,chs,pk,stp,auto}}
+return{given,ret,rem:given-ret,due,acr,pi,wv,lp,pend:Math.max(0,o),ob:o,runG:run,run:Math.max(0,r2(run+Math.min(0,o))),el,owe:Math.max(0,r2(due+run-pi-wv)),nx,days:Math.ceil((new Date(nx)-new Date(t0))/864e5),n,last,cs:s,gs,chs,pk,stp,auto}}
 const stt=(a,c)=>a.done?'🔒 হিসাব বন্ধ':c.stp?(c.auto?'⏸️ আসল আদায় সম্পন্ন — লাভ বন্ধ':'⏸️ লাভ বন্ধ'):'';
 const esc=s=>String(s??'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 function lpBox(a,c){if(a.k!='l'||a.done)return '';return `<div class=np style="margin:10px 0;padding:10px;border-radius:18px;background:linear-gradient(135deg,#e7fbf1,#c9f3de)"><button class="b gn" style="margin:0" onclick="px('${a.id}','lp')">➕ লাভ যোগ করুন</button></div>`}
@@ -403,28 +403,44 @@ else A.innerHTML=bk+`${INS()}<h3>CSV ব্যাকআপ ও রিস্ট�
 const MS=['জানু','ফেব্রু','মার্চ','এপ্রি','মে','জুন','জুলাই','আগ','সেপ্টে','অক্টো','নভে','ডিসে'],MN=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const mlb=k=>MN[+k.slice(5,7)-1]+' '+nb(k.slice(0,4)),eq=s=>esc(s).replace(/"/g,'&quot;');
 const bdg=(a,c)=>{const r=a.done?['সম্পন্ন','#64748b']:c.stp?['লাভ বন্ধ','#d97706']:null;return r?`<em class=bdg style="background:${r[1]}">${r[0]}</em>`:''};
-function mstat(){const M={},z=k=>M[k]||(M[k]={g:0,r:0,p:0});S.acc.filter(a=>!a.x||a.kt).forEach(a=>{z(String(a.d).slice(0,7)).g+=a.p;txs(a).forEach(t=>{const q=z(String(t.d).slice(0,7));if(t.t=='add')q.g+=t.a;else if(t.t=='ret')q.r+=t.a;else if(t.t=='int'||t.t=='lp'||t.t=='pa')q.p+=t.a})});return M}
-function charts(){const M=mstat(),n=new Date(),cur=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'),mk=(y,m)=>y+'-'+String(m+1).padStart(2,'0');
-const RG=[['all','সর্বমোট মাস'],['12','১২ মাস'],['6','৬ মাস'],['3','৩ মাস']],cm=ST.cm||'12',cd=ST.cd||'all';
-const stK=(r,first)=>{if(r=='all')return first;const d=new Date(n.getFullYear(),n.getMonth()-(+r-1),1);return mk(d.getFullYear(),d.getMonth())};
+function mstat(){const M={},z=k=>M[k]||(M[k]={g:0,r:0,a:0,p:0,w:0,rem:0,pend:0}),per=[],n=new Date(),cur=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
+S.acc.filter(a=>!a.x||a.kt).forEach(a=>{const c=calc(a),m={},y=k=>m[k]||(m[k]={g:0,r:0,a:0,p:0,w:0}),kk=d=>String(d).slice(0,7);
+y(kk(a.d)).g+=a.p;
+txs(a).forEach(t=>{const q=y(kk(t.d));if(t.t=='add')q.g+=t.a;else if(t.t=='ret')q.r+=t.a;else if(t.t=='int'||t.t=='lp'||t.t=='pa')q.p+=t.a;else if(t.t=='wv')q.w+=t.a});
+(c.acr||[]).forEach(e=>{y(kk(e.d)).a+=e.v});
+per.push({a,m});Object.keys(m).forEach(k=>{const q=z(k),u=m[k];q.g+=u.g;q.r+=u.r;q.a+=u.a;q.p+=u.p;q.w+=u.w})});
+const ks=Object.keys(M).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();let L=[];
+{const f=ks[0]||cur,e=ks.length&&ks[ks.length-1]>cur?ks[ks.length-1]:cur;let yy=+f.slice(0,4),mm=+f.slice(5)-1;for(;;){const k=yy+'-'+String(mm+1).padStart(2,'0');if(k>e)break;L.push(k);z(k);mm++;if(mm>11){mm=0;yy++}}}
+per.forEach(({a,m})=>{let g=0,r=0,A=0,P=0,W=0;const ek=a.done?String(a.end||'9999').slice(0,7):'9999';
+L.forEach(k=>{const u=m[k];if(u){g+=u.g;r+=u.r;A+=u.a;P+=u.p;W+=u.w}if(!a.x){M[k].rem+=(a.done&&k>=ek)?0:(g-r);M[k].pend+=Math.max(0,A-P-W)}})});
+return{M,L,cur}}
+function charts(){const{M,L,cur}=mstat(),n=new Date(),mk=(y,m)=>y+'-'+String(m+1).padStart(2,'0'),Z={g:0,r:0,a:0,p:0,w:0,rem:0,pend:0};
+const RG=[['all','সর্বমোট মাস'],['12','১২ মাস'],['6','৬ মাস'],['3','৩ মাস']],cm=ST.cm||'12',cd=ST.cd||'all',last=L[L.length-1],first=L[0];
+const stK=(r)=>{if(r=='all')return first;const d=new Date(n.getFullYear(),n.getMonth()-(+r-1),1);return mk(d.getFullYear(),d.getMonth())};
 const chips=(key,cur2)=>`<div class="chp sm" style="margin:2px 0 8px">${RG.map(z=>`<a class="${cur2==z[0]?'on':''}" onclick="setOpt('${key}','${z[0]}')">${z[1]}</a>`).join('')}</div>`;
-let first=Object.keys(M).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort()[0]||cur;if(first>cur)first=cur;
-const ks=[];{const sk=stK(cm,first);let y=+sk.slice(0,4),m=+sk.slice(5)-1;while(mk(y,m)<=cur){ks.push(mk(y,m));m++;if(m>11){m=0;y++}}}
-const v=ks.map(k=>(M[k]||{p:0}).p),mx=Math.max(1,...v),tot=v.reduce((a,b)=>a+b,0),cnt=ks.length;
-const step=cnt>12?28:320/cnt,w=Math.min(36,step*.72),W=Math.max(320,Math.round(step*cnt)+8),hz=step>=50;
-const bars=ks.map((k,i)=>{const h=Math.round(v[i]/mx*70),x=(cnt>12?4:0)+i*step+(step-w)/2,yb=124,yr=+k.slice(0,4),mi=+k.slice(5)-1;
-const lb=v[i]?(hz?`<text x="${x+w/2}" y="${yb-h-5}" text-anchor="middle" font-size="11" font-weight="800">${nb(Math.round(v[i]))}</text>`:`<text transform="translate(${x+w/2+3} ${yb-h-4}) rotate(-90)" font-size="8" font-weight="700">${nb(Math.round(v[i]))}</text>`):'';
-return `<rect x="${x}" y="${yb-Math.max(h,1)}" width="${w}" height="${Math.max(h,1)}" rx="4" fill="#16A36A"/>${lb}<text x="${x+w/2}" y="136" text-anchor="middle" font-size="${hz?10:7.5}">${MS[mi]}</text>${(mi==0||i==0)?`<text x="${x+w/2}" y="147" text-anchor="middle" font-size="${hz?9:7}" opacity=".65">${nb(yr)}</text>`:''}`}).join('');
-const dk=stK(cd,first);
-let pr=0,pi=0,pd=0;S.acc.filter(a=>!a.x||a.kt).forEach(a=>{const c=calc(a);if(cd=='all')pi+=c.pi;if(a.x)return;if(!a.done)pr+=c.rem;pd+=c.pend});
-if(cd!='all')Object.keys(M).forEach(k=>{if(k>=dk&&k<=cur)pi+=M[k].p});
-const D=[['আসল (বর্তমান)',pr,'#3278C8'],['আদায়কৃত লাভ'+(cd=='all'?'':' (শেষ '+nb(cd)+' মাস)'),pi,'#16A36A'],['বকেয়া লাভ',pd,'#DC4545']],tt2=pr+pi+pd,C=2*Math.PI*40;let off=0;
-const arcs=tt2?D.map(([l,x,c])=>{const L=x/tt2*C,e=`<circle r=40 cx=60 cy=60 fill=none stroke="${c}" stroke-width=22 stroke-dasharray="${L} ${C-L}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;off+=L;return e}).join(''):'<circle r=40 cx=60 cy=60 fill=none stroke="#9ca3af55" stroke-width=22 />';
-return `<div class="gc cht"><b class=gt>📈 মাসওয়ারি আদায়কৃত লাভ</b>${chips('cm',cm)}<div style="display:flex;justify-content:space-between;align-items:center;font-size:13.5px;font-weight:800;margin:0 2px 4px"><span style="color:var(--mu)">${cm=='all'?'সর্বমোট '+nb(cnt)+' মাস':'শেষ '+RG.find(z=>z[0]==cm)[1]}</span><span style="color:#16A36A">মোট আদায়কৃত লাভ: ${bn(tot)}</span></div><div class=cscr style="overflow-x:auto"><svg viewBox="0 0 ${W} 152" ${cnt>12?`width="${W}"`:'width="100%"'} role=img>${bars}</svg></div></div><div class="gc cht"><b class=gt>🍩 হিসাবের চার্ট</b>${chips('cd',cd)}<div style="display:flex;align-items:center;gap:12px"><svg viewBox="0 0 120 120" width=130 height=130 style="flex:none">${arcs}</svg><div style="flex:1;font-size:13px;font-weight:700">${D.map(([l,x,c])=>`<div style="margin:5px 0"><u style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:6px"></u>${l}<br><span style="margin-left:16px">${bn(x)} • ${tt2?nb(Math.round(x/tt2*100)):'০'}%</span></div>`).join('')}</div></div></div>`}
-function mrep(){const G={},Y={},z=(o,k)=>o[k]||(o[k]={n:0,g:0,r:0,m:0,d:0,i:0,b:0}),add=(q,c)=>{q.n++;q.g+=c.given;q.r+=c.ret;q.m+=c.rem;q.d+=c.due;q.i+=c.pi;q.b+=c.pend};
-live().forEach(a=>{const c=calc(a),k=String(a.d).slice(0,7);add(z(G,k),c);add(z(Y,k.slice(0,4)),c)});
-const tb=r=>`<div class="sl sc1"><table class=rt><colgroup><col style="width:23%">${'<col>'.repeat(6)}</colgroup><tr><th>নাম<th>মূল<th>ফেরত<th>বাকি<th>লাভ<th>আদায়<th>বকেয়া</tr>${r||'<tr><td colspan=7>কিছু নেই</tr>'}</table></div>`,rw=(l,q)=>`<tr><td class=nm>${l}<td>${bt(q.g)}<td>${bt(q.r)}<td>${bt(q.m)}<td>${bt(q.d)}<td>${bt(q.i)}<td>${bt(q.b)}</tr>`;
-return `<details class=dt open><summary>📅 মাসিক রিপোর্ট</summary>${tb(Object.keys(G).sort().reverse().map(k=>rw(MN[+k.slice(5)-1]+'<br><small style="color:var(--mu);font-size:.85em">'+nb(k.slice(0,4))+'</small>',G[k])).join(''))}</details><details class=dt><summary>🗓️ বার্ষিক রিপোর্ট</summary>${tb(Object.keys(Y).sort().reverse().map(y=>rw(nb(y),Y[y])).join(''))}</details>`}
+const inR=(k,r)=>k>=stK(r)&&(r=='all'?k<=last:k<=cur);
+const ks=[];{const sk=stK(cm);let y=+sk.slice(0,4),m=+sk.slice(5)-1;const e=cm=='all'?last:cur;while(mk(y,m)<=e){ks.push(mk(y,m));m++;if(m>11){m=0;y++}}}
+const A=ks.map(k=>(M[k]||Z).a),P=ks.map(k=>(M[k]||Z).p),mx=Math.max(1,...A,...P),tA=A.reduce((a,b)=>a+b,0),tP=P.reduce((a,b)=>a+b,0),cnt=ks.length;
+const step=cnt>12?30:320/cnt,bw=Math.min(18,step*.36),W=Math.max(320,Math.round(step*cnt)+8),hz=step>=90;
+const lab=(x,h,val)=>val?(hz?`<text x="${x+bw/2}" y="${124-h-4}" text-anchor="middle" font-size="9" font-weight="800">${nb(Math.round(val))}</text>`:`<text transform="translate(${x+bw/2+3} ${124-h-3}) rotate(-90)" font-size="7.5" font-weight="700">${nb(Math.round(val))}</text>`):'';
+const bars=ks.map((k,i)=>{const hA=Math.round(A[i]/mx*68),hP=Math.round(P[i]/mx*68),x0=(cnt>12?4:0)+i*step+(step-2*bw-2)/2,x1=x0+bw+2,yr=+k.slice(0,4),mi=+k.slice(5)-1,cx=x0+bw+1;
+return `<rect x="${x0}" y="${124-Math.max(hA,1)}" width="${bw}" height="${Math.max(hA,1)}" rx="3" fill="#F59E0B"/><rect x="${x1}" y="${124-Math.max(hP,1)}" width="${bw}" height="${Math.max(hP,1)}" rx="3" fill="#16A36A"/>${lab(x0,hA,A[i])}${lab(x1,hP,P[i])}<text x="${cx}" y="136" text-anchor="middle" font-size="${hz?10:7.5}">${MS[mi]}</text>${(mi==0||i==0)?`<text x="${cx}" y="147" text-anchor="middle" font-size="${hz?9:7}" opacity=".65">${nb(yr)}</text>`:''}`}).join('');
+let pr=0,pd=0,pc=0,ta=0,wv2=0;S.acc.filter(a=>!a.x||a.kt).forEach(a=>{const c=calc(a);if(cd=='all')pc+=c.pi;if(a.x)return;if(!a.done)pr+=c.rem;pd+=c.pend});
+Object.keys(M).forEach(k=>{if(inR(k,cd)){ta+=M[k].a;wv2+=M[k].w;if(cd!='all')pc+=M[k].p}});
+const pdv=cd=='all'?pd:Math.max(0,Math.round(ta-pc-wv2)),D=[['আসল (বর্তমান)',pr,'#3278C8'],['মোট লাভ (পূর্ণ মাস)',ta,'#F59E0B']],tt2=pr+ta,C=2*Math.PI*40,pct=(x,t)=>t?nb(Math.round(x/t*100)):'০';let off=0;
+const arcs=tt2?D.map(([l,x,c])=>{const L2=x/tt2*C,e=`<circle r=40 cx=60 cy=60 fill=none stroke="${c}" stroke-width=22 stroke-dasharray="${L2} ${C-L2}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;off+=L2;return e}).join(''):'<circle r=40 cx=60 cy=60 fill=none stroke="#9ca3af55" stroke-width=22 />';
+const sub=[['লাভ আদায়',pc,'#16A36A'],['বকেয়া',pdv,'#DC4545']].concat(wv2>0?[['ছাড়',wv2,'#9ca3af']]:[]),st=sub.reduce((a,z)=>a+z[1],0),sp=[];{let u=0;sub.forEach((z,i)=>{const v=!st?0:i<sub.length-1?Math.round(z[1]/st*100):100-u;sp.push(v);u+=v})}
+const dot=c=>`<u style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:6px"></u>`;
+return `<div class="gc cht"><b class=gt>📈 মাসওয়ারি লাভ</b>${chips('cm',cm)}<div style="font-size:12.5px;color:var(--mu);font-weight:700;margin:0 2px 5px">${cm=='all'?'সর্বমোট '+nb(cnt)+' মাস':'শেষ '+RG.find(z=>z[0]==cm)[1]}</div><div style="display:flex;gap:8px;margin:0 0 6px"><div style="flex:1;border-radius:10px;padding:6px 9px;background:#F59E0B22"><div style="font-size:11.5px;font-weight:700">${dot('#F59E0B')}মোট লাভ</div><div style="font-size:15px;font-weight:900">${bn(tA)}</div></div><div style="flex:1;border-radius:10px;padding:6px 9px;background:#16A36A22"><div style="font-size:11.5px;font-weight:700">${dot('#16A36A')}লাভ আদায়</div><div style="font-size:15px;font-weight:900">${bn(tP)}</div></div></div><div class=cscr style="overflow-x:auto"><svg viewBox="0 0 ${W} 152" ${cnt>12?`width="${W}"`:'width="100%"'} role=img>${bars}</svg></div></div><div class="gc cht"><b class=gt>🍩 হিসাবের চার্ট</b>${chips('cd',cd)}<div style="display:flex;align-items:center;gap:12px"><svg viewBox="0 0 120 120" width=130 height=130 style="flex:none">${arcs}</svg><div style="flex:1;font-size:13px;font-weight:700">${D.map(([l,x,c])=>`<div style="margin:5px 0">${dot(c)}${l}<br><span style="margin-left:16px"><span class=dv>${bn(x)}</span> • ${pct(x,tt2)}%</span></div>`).join('')}<div style="margin:8px 0 0;padding-top:6px;border-top:1px solid #9ca3af44;font-size:12px;color:var(--mu);font-weight:700">${cd=='all'?'সর্বমোট মাসের':'শেষ '+nb(cd)+' মাসের'} লাভ আদায় ও বকেয়ার অনুপাত:</div>${sub.map(([l,x,c],i)=>`<div style="margin:5px 0">${dot(c)}${l}<br><span style="margin-left:16px"><span class=dv>${bn(x)}</span> • ${nb(sp[i])}%</span></div>`).join('')}</div></div></div>`}
+function mrep(){const{M,L}=mstat(),Z={g:0,r:0,a:0,p:0,w:0,rem:0,pend:0},Y={};
+L.forEach(k=>{const y=k.slice(0,4),q=M[k]||Z,o=Y[y]||(Y[y]={g:0,r:0,a:0,p:0,rem:0,pend:0});o.g+=q.g;o.r+=q.r;o.a+=q.a;o.p+=q.p;o.rem=q.rem;o.pend=q.pend});
+const cl=(v,c)=>`<td style="color:${c};font-weight:700">${bt(v)}`,
+rw=(l,q,b)=>`<tr${b?' style="font-weight:900"':''}><td class=nm>${l}<td>${bt(q.g)}<td>${bt(q.r)}<td>${bt(q.rem)}${cl(q.a,'#d97706')}${cl(q.p,'#16a36a')}${cl(q.pend,q.pend>0?'#dc2626':'inherit')}</tr>`,
+tb=r=>`<div class="sl sc1"><table class=rt><colgroup><col style="width:21%">${'<col>'.repeat(6)}</colgroup><tr><th>নাম<th>মূল<th>ফেরত<th>বাকি<th>লাভ<th>আদায়<th>বকেয়া</tr>${r}</table></div>`,
+tot=Z2=>{const t={g:0,r:0,a:0,p:0,rem:Z2.rem,pend:Z2.pend};L.forEach(k=>{const q=M[k]||Z;t.g+=q.g;t.r+=q.r;t.a+=q.a;t.p+=q.p});return rw('মোট',t,1)},
+lt=M[L[L.length-1]]||Z,
+note='<div style="font-size:12px;color:var(--mu);line-height:1.5;margin:6px 2px 2px">লাভ = ঐ মাসে পূর্ণ হওয়া মাসের লাভ • আদায় = ঐ মাসে আদায় • বাকি ও বকেয়া = মাস শেষের হিসাব (মোট সারিতে বর্তমান)</div>';
+return `<details class=dt open><summary>📅 মাসিক রিপোর্ট</summary>${tb(L.slice().reverse().map(k=>rw(MN[+k.slice(5)-1]+'<br><small style="color:var(--mu);font-size:.85em">'+nb(k.slice(0,4))+'</small>',M[k]||Z)).join('')+tot(lt))}${note}</details><details class=dt><summary>🗓️ বার্ষিক রিপোর্ট</summary>${tb(Object.keys(Y).sort().reverse().map(y=>rw(nb(y),Y[y])).join('')+tot(lt))}${note}</details>`}
 function binPurge(){const t=Date.now()-30*864e5;if((S.bin||[]).some(b=>b.ts<t)){S.bin=S.bin.filter(b=>b.ts>=t);try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}}
 function binPage(){binPurge();const B=(S.bin||[]).slice().sort((a,b)=>b.ts-a.ts);return ubBox()+`<h3>♻️ রিসাইকেল বিন</h3><p style="color:var(--mu);font-size:14px;margin:4px 0 10px">মুছে ফেলা হিসাব ৩০ দিন পর্যন্ত এখানে থাকবে। এরপর স্থায়ীভাবে মুছে যাবে।</p>`+(B.map(b=>{const a=b.a,d=Math.max(0,Math.ceil((b.ts+30*864e5-Date.now())/864e5));return `<div class=gc><b>${T[a.k]?T[a.k].e:''} ${esc(a.name||'')}</b><div style="color:var(--mu);font-size:13px;margin:4px 0 8px">মুছেছেন: ${fd(new Date(b.ts).toLocaleString('sv').slice(0,10))} • আর ${nb(d)} দিন বাকি</div><div class=row><button class="b gn" onclick="binR('${b.id}')">↩️ ফিরিয়ে আনুন</button><button class="b gr" onclick="binD('${b.id}')">চিরতরে মুছুন</button></div></div>`}).join('')||'<p style="text-align:center;color:var(--mu)">রিসাইকেল বিন খালি</p>')}
 function binR(id){const b=(S.bin||[]).find(x=>x.id==id);if(!b)return;if(b.m=='keep'){const a=ga(b.a.id);if(a){delete a.x;delete a.kt}}else if(!ga(b.a.id)){S.acc.push(b.a);(b.tx||[]).forEach(x=>S.tx.push(x))}S.bin=S.bin.filter(x=>x.id!=id);sv();R();tt('♻️ হিসাব ফিরিয়ে আনা হয়েছে')}
