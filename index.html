@@ -406,8 +406,8 @@ const bdg=(a,c)=>{const r=a.done?['সম্পন্ন','#64748b']:c.stp?['ল
 function mstat(){const M={},z=k=>M[k]||(M[k]={g:0,r:0,a:0,p:0,w:0,rem:0,pend:0}),per=[],n=new Date(),cur=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');
 S.acc.filter(a=>!a.x||a.kt).forEach(a=>{const c=calc(a),m={},y=k=>m[k]||(m[k]={g:0,r:0,a:0,p:0,w:0}),kk=d=>String(d).slice(0,7);
 y(kk(a.d)).g+=a.p;
-txs(a).forEach(t=>{const q=y(kk(t.d));if(t.t=='add')q.g+=t.a;else if(t.t=='ret')q.r+=t.a;else if(t.t=='int'||t.t=='lp'||t.t=='pa')q.p+=t.a;else if(t.t=='wv')q.w+=t.a});
-(c.acr||[]).forEach(e=>{y(kk(e.d)).a+=e.v});
+txs(a).forEach(t=>{const q=y(kk(t.d));if(t.t=='add')q.g+=t.a;else if(t.t=='ret')q.r+=t.a;else if(t.t=='int'||t.t=='lp'||t.t=='pa'){q.p+=t.a;if(a.k=='l')q.a+=t.a}else if(t.t=='wv')q.w+=t.a});
+if(a.k!='l')(c.acr||[]).forEach(e=>{y(kk(e.d)).a+=e.v});
 per.push({a,m});Object.keys(m).forEach(k=>{const q=z(k),u=m[k];q.g+=u.g;q.r+=u.r;q.a+=u.a;q.p+=u.p;q.w+=u.w})});
 const ks=Object.keys(M).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();let L=[];
 {const f=ks[0]||cur,e=ks.length&&ks[ks.length-1]>cur?ks[ks.length-1]:cur;let yy=+f.slice(0,4),mm=+f.slice(5)-1;for(;;){const k=yy+'-'+String(mm+1).padStart(2,'0');if(k>e)break;L.push(k);z(k);mm++;if(mm>11){mm=0;yy++}}}
@@ -427,7 +427,7 @@ const bars=ks.map((k,i)=>{const hA=Math.round(A[i]/mx*68),hP=Math.round(P[i]/mx*
 return `<rect x="${x0}" y="${124-Math.max(hA,1)}" width="${bw}" height="${Math.max(hA,1)}" rx="3" fill="#F59E0B"/><rect x="${x1}" y="${124-Math.max(hP,1)}" width="${bw}" height="${Math.max(hP,1)}" rx="3" fill="#16A36A"/>${lab(x0,hA,A[i])}${lab(x1,hP,P[i])}<text x="${cx}" y="136" text-anchor="middle" font-size="${hz?10:7.5}">${MS[mi]}</text>${(mi==0||i==0)?`<text x="${cx}" y="147" text-anchor="middle" font-size="${hz?9:7}" opacity=".65">${nb(yr)}</text>`:''}`}).join('');
 let pr=0,pd=0,pc=0,ta=0,wv2=0;S.acc.filter(a=>!a.x||a.kt).forEach(a=>{const c=calc(a);if(cd=='all')pc+=c.pi;if(a.x)return;if(!a.done)pr+=c.rem;pd+=c.pend});
 Object.keys(M).forEach(k=>{if(inR(k,cd)){ta+=M[k].a;wv2+=M[k].w;if(cd!='all')pc+=M[k].p}});
-const pdv=cd=='all'?pd:Math.max(0,Math.round(ta-pc-wv2)),D=[['আসল (বর্তমান)',pr,'#3278C8'],['মোট লাভ (পূর্ণ মাস)',ta,'#F59E0B']],tt2=pr+ta,C=2*Math.PI*40,pct=(x,t)=>t?nb(Math.round(x/t*100)):'০';let off=0;
+const pdv=cd=='all'?pd:Math.max(0,Math.round(ta-pc-wv2)),D=[['আসল (বর্তমান)',pr,'#3278C8'],['মোট লাভ',ta,'#F59E0B']],tt2=pr+ta,C=2*Math.PI*40,pct=(x,t)=>t?nb(Math.round(x/t*100)):'০';let off=0;
 const arcs=tt2?D.map(([l,x,c])=>{const L2=x/tt2*C,e=`<circle r=40 cx=60 cy=60 fill=none stroke="${c}" stroke-width=22 stroke-dasharray="${L2} ${C-L2}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`;off+=L2;return e}).join(''):'<circle r=40 cx=60 cy=60 fill=none stroke="#9ca3af55" stroke-width=22 />';
 const sub=[['লাভ আদায়',pc,'#16A36A'],['বকেয়া',pdv,'#DC4545']].concat(wv2>0?[['ছাড়',wv2,'#9ca3af']]:[]),st=sub.reduce((a,z)=>a+z[1],0),sp=[];{let u=0;sub.forEach((z,i)=>{const v=!st?0:i<sub.length-1?Math.round(z[1]/st*100):100-u;sp.push(v);u+=v})}
 const dot=c=>`<u style="display:inline-block;width:10px;height:10px;border-radius:3px;background:${c};margin-right:6px"></u>`;
@@ -439,7 +439,7 @@ rw=(l,q,b)=>`<tr${b?' style="font-weight:900"':''}><td class=nm>${l}<td>${bt(q.g
 tb=r=>`<div class="sl sc1"><table class=rt><colgroup><col style="width:21%">${'<col>'.repeat(6)}</colgroup><tr><th>নাম<th>মূল<th>ফেরত<th>বাকি<th>লাভ<th>আদায়<th>বকেয়া</tr>${r}</table></div>`,
 tot=Z2=>{const t={g:0,r:0,a:0,p:0,rem:Z2.rem,pend:Z2.pend};L.forEach(k=>{const q=M[k]||Z;t.g+=q.g;t.r+=q.r;t.a+=q.a;t.p+=q.p});return rw('মোট',t,1)},
 lt=M[L[L.length-1]]||Z,
-note='<div style="font-size:12px;color:var(--mu);line-height:1.5;margin:6px 2px 2px">লাভ = ঐ মাসে পূর্ণ হওয়া মাসের লাভ • আদায় = ঐ মাসে আদায় • বাকি ও বকেয়া = মাস শেষের হিসাব (মোট সারিতে বর্তমান)</div>';
+note='<div style="font-size:12px;color:var(--mu);line-height:1.5;margin:6px 2px 2px">লাভ = ঐ মাসে পূর্ণ হওয়া মাসের লাভ + হাওলাত বিভাগের লাভ • আদায় = ঐ মাসে আদায় • বাকি ও বকেয়া = মাস শেষের হিসাব (মোট সারিতে বর্তমান)</div>';
 return `<details class=dt open><summary>📅 মাসিক রিপোর্ট</summary>${tb(L.slice().reverse().map(k=>rw(MN[+k.slice(5)-1]+'<br><small style="color:var(--mu);font-size:.85em">'+nb(k.slice(0,4))+'</small>',M[k]||Z)).join('')+tot(lt))}${note}</details><details class=dt><summary>🗓️ বার্ষিক রিপোর্ট</summary>${tb(Object.keys(Y).sort().reverse().map(y=>rw(nb(y),Y[y])).join('')+tot(lt))}${note}</details>`}
 function binPurge(){const t=Date.now()-30*864e5;if((S.bin||[]).some(b=>b.ts<t)){S.bin=S.bin.filter(b=>b.ts>=t);try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}}
 function binPage(){binPurge();const B=(S.bin||[]).slice().sort((a,b)=>b.ts-a.ts);return ubBox()+`<h3>♻️ রিসাইকেল বিন</h3><p style="color:var(--mu);font-size:14px;margin:4px 0 10px">মুছে ফেলা হিসাব ৩০ দিন পর্যন্ত এখানে থাকবে। এরপর স্থায়ীভাবে মুছে যাবে।</p>`+(B.map(b=>{const a=b.a,d=Math.max(0,Math.ceil((b.ts+30*864e5-Date.now())/864e5));return `<div class=gc><b>${T[a.k]?T[a.k].e:''} ${esc(a.name||'')}</b><div style="color:var(--mu);font-size:13px;margin:4px 0 8px">মুছেছেন: ${fd(new Date(b.ts).toLocaleString('sv').slice(0,10))} • আর ${nb(d)} দিন বাকি</div><div class=row><button class="b gn" onclick="binR('${b.id}')">↩️ ফিরিয়ে আনুন</button><button class="b gr" onclick="binD('${b.id}')">চিরতরে মুছুন</button></div></div>`}).join('')||'<p style="text-align:center;color:var(--mu)">রিসাইকেল বিন খালি</p>')}
