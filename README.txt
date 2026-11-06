@@ -8,6 +8,6 @@ GitHub Pages-এ প্রকাশ (repository নাম: hisab-book):
 3. Settings → Pages → Branch: main, Folder: /(root) → Save।
 4. কিছুক্ষণ পর https://আপনার-ইউজারনেম.github.io/hisab-book/ লিংকে অ্যাপ চালু হবে।
 
-আপডেট দিলে: নতুন ফাইল আপলোড করুন; sw.js-এর প্রথম লাইনে 'hisab-book-ver4' বদলে নতুন নাম (যেমন 'hisab-book-ver5') দিন।
+আপডেট দিলে: নতুন ফাইল আপলোড করুন; sw.js-এর প্রথম লাইনে 'hisab-book-ver4b' বদলে নতুন নাম (যেমন 'hisab-book-ver5') দিন।
 
 ব্যাকআপ: তথ্য ব্রাউজারের localStorage-এ থাকে। নিয়মিত "CSV ব্যাকআপ" নিন, রিস্টোরে "CSV ফাইল বেছে রিস্টোর" ব্যবহার করুন।
